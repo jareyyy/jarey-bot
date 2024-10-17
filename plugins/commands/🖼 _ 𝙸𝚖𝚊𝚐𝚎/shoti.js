@@ -1,29 +1,38 @@
 import axios from 'axios';
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 
 const config = {
-    name: "shoti",
-    version: "1",
+    name: "video",
+    version: "1.0",
     permissions: [0],
-    credits: "Ralph",
-    description: "Shoti Command",
+    credits: "Your_Name",
+    description: "Send a video from a specified source",
     commandCategory: "media",
     cooldown: 5,
 };
 
 const apiConfig = {
-    name: "Shoti API",
-    url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
+    name: "Video API",
+    url: () => 'https://your-video-api-url.com/getVideo?apikey=yourapikey',
 };
 
 const cachePath = './cache'; // Ensure this directory exists
+
+// Function to create the cache folder if it doesn't exist
+async function ensureCacheFolderExists() {
+    try {
+        await fs.ensureDir(cachePath);
+    } catch (error) {
+        console.error('Error creating cache folder:', error);
+    }
+}
 
 async function sendVideo(message) {
     const { name } = apiConfig;
     const apiUrl = apiConfig.url();
 
-    message.send(`⏱️ | Video is sending, please wait.`);
+    await message.send(`⏱️ | Video is sending, please wait.`);
 
     try {
         const response = await axios.get(apiUrl);
@@ -31,14 +40,14 @@ async function sendVideo(message) {
         // Log the response to see its structure
         console.log("API Response:", response.data);
 
-        // Check if the shotiurl exists in the response
-        if (!response.data || !response.data.shotiurl) {
-            throw new Error("shotiurl not found in the API response.");
+        // Check if the video URL exists in the response
+        if (!response.data || !response.data.videoUrl) {
+            throw new Error("videoUrl not found in the API response.");
         }
 
-        const videoUrl = response.data.shotiurl;
+        const videoUrl = response.data.videoUrl;
         const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
-        const videoPath = path.join(cachePath, `shoti.${ext}`);
+        const videoPath = path.join(cachePath, `video.${ext}`);
 
         // Log the video URL and path
         console.log("Downloading video from:", videoUrl);
@@ -56,7 +65,7 @@ async function sendVideo(message) {
 
         writer.on('finish', () => {
             message.send({
-                body: `Here is your video from TikTok!`,
+                body: `Here is your video!`,
                 attachment: fs.createReadStream(videoPath)
             }, (err) => {
                 if (err) {
@@ -85,6 +94,7 @@ async function sendVideo(message) {
 }
 
 async function onCall({ message }) {
+    await ensureCacheFolderExists(); // Ensure cache folder exists
     await sendVideo(message);
 }
 
