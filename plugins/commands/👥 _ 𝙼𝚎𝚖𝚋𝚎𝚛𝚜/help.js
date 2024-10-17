@@ -1,10 +1,10 @@
 const config = {
     name: "help",
-    aliases: ["help"],
+    aliases: ["cmds", "commands"],
     version: "1.0.3",
     description: "Show all commands or command details",
     usage: "[command] (optional)",
-    credits: "coffee"
+    credits: "XaviaTeam/Liane/coffee"
 };
 
 function getCommandName(commandName) {
@@ -31,11 +31,8 @@ async function onCall({ message, args, userPermissions, prefix }) {
             category.push(`- ${value._name?.[language] || key}`);
         }
 
-        // Arrange categories in the specified order
-        let orderedCategories = ["📖 | 𝙴𝚍𝚞𝚌𝚊𝚝𝚒𝚘𝚗", "🖼 | 𝙸𝚖𝚊𝚐𝚎", "🎧 | 𝙼𝚞𝚜𝚒𝚌", "👥 | 𝙼𝚎𝚖𝚋𝚎𝚛𝚜"];
-
-        const commandList = orderedCategories
-            .filter(category => commands[category])
+        // Automatically group by categories but without enforcing any particular order
+        const commandList = Object.keys(commands)
             .map(category => `
 ╭─╼━━━━━━━━╾─╮
 │  ${category}
