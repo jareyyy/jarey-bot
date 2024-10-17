@@ -1,7 +1,7 @@
 import { loadImage, createCanvas } from "canvas";
 import { join } from "path";
 
-export const config = {
+const config = {
     name: "billboard",
     version: "0.0.2-xaviabot-port",
     description: "",
@@ -87,3 +87,7 @@ export async function onCall({ message, args }) {
         message.reply("Error");
     }
 }
+export default {
+    config,
+    onCall,
+};
