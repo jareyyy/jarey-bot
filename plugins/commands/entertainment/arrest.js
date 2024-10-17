@@ -1,7 +1,7 @@
 import { join } from "path";
 import { loadImage, createCanvas } from "canvas";
 
-export const config = {
+const config = {
     name: "arrest",
     version: "0.0.1-xaviabot-port-refactor",
     credits: "Joshua Sy",
@@ -79,3 +79,7 @@ export async function onCall({ message }) {
             });
     }
 }
+export default {
+    config,
+    onCall,
+};
