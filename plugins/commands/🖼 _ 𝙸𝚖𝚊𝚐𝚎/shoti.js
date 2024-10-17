@@ -64,17 +64,22 @@ async function sendVideo(message) {
         responseVideo.data.pipe(writer);
 
         writer.on('finish', () => {
-            message.send({
-                body: `Here is your video!`,
-                attachment: fs.createReadStream(videoPath)
-            }, (err) => {
-                if (err) {
-                    console.error("Error sending video:", err);
-                } else {
-                    console.log("Video sent successfully.");
-                }
-                fs.unlinkSync(videoPath); // Clean up the file after sending
-            });
+            // Check if message.send is a function
+            if (typeof message.send === 'function') {
+                message.send({
+                    body: `Here is your video!`,
+                    attachment: fs.createReadStream(videoPath)
+                }, (err) => {
+                    if (err) {
+                        console.error("Error sending video:", err);
+                    } else {
+                        console.log("Video sent successfully.");
+                    }
+                    fs.unlinkSync(videoPath); // Clean up the file after sending
+                });
+            } else {
+                console.error("message.send is not a function.");
+            }
         });
 
         writer.on('error', (err) => {
@@ -92,13 +97,3 @@ async function sendVideo(message) {
         }
     }
 }
-
-async function onCall({ message }) {
-    await ensureCacheFolderExists(); // Ensure cache folder exists
-    await sendVideo(message);
-}
-
-export default {
-    config,
-    onCall
-};
