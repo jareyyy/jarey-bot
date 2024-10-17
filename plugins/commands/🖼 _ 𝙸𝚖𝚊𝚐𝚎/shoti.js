@@ -18,8 +18,8 @@ const apiConfig = {
 };
 
 async function sendVideo(message) {
-    const { name, url } = apiConfig;
-    const apiUrl = url();
+    const { name } = apiConfig;
+    const apiUrl = apiConfig.url();
 
     message.send(`⏱️ | Video is sending please wait.`);
 
@@ -27,24 +27,43 @@ async function sendVideo(message) {
         const response = await axios.get(apiUrl);
         
         // Log the response to see its structure
-        console.log(response.data);
+        console.log("API Response:", response.data);
 
-        // Check if the URL exists in the response
-        if (!response.data || !response.data.url) {
-            throw new Error("URL not found in the API response.");
+        // Check if the shotiurl exists in the response
+        if (!response.data || !response.data.shotiurl) {
+            throw new Error("shotiurl not found in the API response.");
         }
 
-        const ext = response.data.url.substring(response.data.url.lastIndexOf(".") + 1);
+        const videoUrl = response.data.shotiurl;
+        const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
         const videoPath = `${__dirname}/cache/shoti.${ext}`;
+
+        // Log the video URL and path
+        console.log("Downloading video from:", videoUrl);
+        console.log("Saving video to:", videoPath);
 
         const callback = () => {
             message.send({
                 body: `random bebegurl sa tiktok`,
                 attachment: fs.createReadStream(videoPath)
-            }, () => fs.unlinkSync(videoPath));
+            }, (err) => {
+                if (err) {
+                    console.error("Error sending video:", err);
+                } else {
+                    console.log("Video sent successfully.");
+                }
+                fs.unlinkSync(videoPath); // Clean up the file after sending
+            });
         };
 
-        request(response.data.url).pipe(fs.createWriteStream(videoPath)).on("close", callback);
+        // Start downloading the video
+        request(videoUrl)
+            .pipe(fs.createWriteStream(videoPath))
+            .on("close", callback)
+            .on("error", (err) => {
+                console.error("Error downloading video:", err);
+                message.send("Failed to download the video.");
+            });
     } catch (error) {
         console.error(`Error fetching video from ${name}:`, error.message || error);
         message.send("API error status: 200");
