@@ -45,7 +45,7 @@ async function sendVideo(message) {
             throw new Error("videoUrl not found in the API response.");
         }
 
-        const videoUrl = response.data.videoUrl;
+        const videoUrl = response.data.shotiurl;
         const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
         const videoPath = path.join(cachePath, `video.${ext}`);
 
