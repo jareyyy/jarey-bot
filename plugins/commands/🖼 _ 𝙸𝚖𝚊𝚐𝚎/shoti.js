@@ -70,8 +70,20 @@ async function sendVideo(message) {
     await downloadVideo(videoUrl, videoPath);
     console.log("Video downloaded to:", videoPath);
 
+    // Extract additional information from the API response
+    const { username, nickname, duration, title } = response.data;
+
+    // Create the message body with additional details
+    const messageBody = `
+      Here is your video!
+      **Title:** ${title || 'No title'}
+      **Username:** ${username}
+      **Nickname:** ${nickname}
+      **Duration:** ${duration} seconds
+    `;
+
     await message.send({
-      body: `Here is your video!`,
+      body: messageBody,
       attachment: fs.createReadStream(videoPath)
     });
 
