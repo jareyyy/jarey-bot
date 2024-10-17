@@ -76,10 +76,10 @@ async function sendVideo(message) {
     // Create the message body with additional details
     const messageBody = `
       Here is your video!
-      **Title:** ${title || 'No title'}
-      **Username:** ${username}
-      **Nickname:** ${nickname}
-      **Duration:** ${duration} seconds
+        Title: ${title || 'No title'}
+        Username: ${username}
+        Nickname: ${nickname}
+        Duration: ${duration} seconds
     `;
 
     await message.send({
