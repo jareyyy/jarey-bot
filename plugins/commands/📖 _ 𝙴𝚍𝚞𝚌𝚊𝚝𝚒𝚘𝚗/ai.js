@@ -14,7 +14,7 @@ async function onCall({ message, args }) {
     const query = args.join(" ") || "hi";
     const userId = message.senderID; // Get user ID from message
 
-    const header = "(⁠◍⁠•⁠ᴗ⁠•⁠◍⁠) | 𝙼𝚘𝚌𝚑𝚊 𝙰𝚒\n・──────────────・";
+    const header = "Hi Tanginamo mwa \n・──────────────・";
     const footer = "・───── >ᴗ< ──────・";
 
     // Check for image attachments in the original message
@@ -28,13 +28,13 @@ async function onCall({ message, args }) {
             const { vision } = response.data;
 
             if (vision) {
-                return await message.reply(`${header}\n${vision}\n${footer}`);
+                return await message.send(`${header}\n${vision}\n${footer}`);
             } else {
-                return await message.reply(`${header}\nFailed to recognize the image.\n${footer}`);
+                return await message.send(`${header}\nFailed to recognize the image.\n${footer}`);
             }
         } catch (error) {
             console.error("Error fetching image recognition:", error);
-            return await message.reply(`${header}\nAn error occurred while processing the image.\n${footer}`);
+            return await message.send(`${header}\nAn error occurred while processing the image.\n${footer}`);
         }
     }
 
@@ -43,13 +43,13 @@ async function onCall({ message, args }) {
         const { data } = await axios.get(`https://lorex-gpt4.onrender.com/api/gpt4?prompt=${encodeURIComponent(query)}&uid=${userId}`);
 
         if (data && data.response) {
-            await message.reply(`${header}\n${data.response}\n${footer}`);
+            await message.send(`${header}\n${data.response}\n${footer}`);
         } else {
-            await message.reply(`${header}\nSorry, I couldn't get a response from the API.\n${footer}`);
+            await message.send(`${header}\nSorry, I couldn't get a response from the API.\n${footer}`);
         }
     } catch (error) {
         console.error("Error fetching from GPT-4 API:", error);
-        await message.reply(`${header}\nAn error occurred while trying to reach the API.\n${footer}`);
+        await message.send(`${header}\nAn error occurred while trying to reach the API.\n${footer}`);
     }
 }
 
