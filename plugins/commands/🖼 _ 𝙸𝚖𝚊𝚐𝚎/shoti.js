@@ -1,3 +1,22 @@
+import axios from 'axios';
+import request from 'request';
+import fs from 'fs';
+
+const config = {
+    name: "shoti",
+    version: "1",
+    permissions: [0],
+    credits: "Ralph",
+    description: "Shoti Command",
+    commandCategory: "media",
+    cooldown: 5,
+};
+
+const apiConfig = {
+    name: "Shoti API",
+    url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
+};
+
 async function sendVideo(message) {
     const { name, url } = apiConfig;
     const apiUrl = url();
@@ -36,3 +55,12 @@ async function sendVideo(message) {
         }
     }
 }
+
+async function onCall({ message }) {
+    await sendVideo(message);
+}
+
+export default {
+    config,
+    onCall
+};
