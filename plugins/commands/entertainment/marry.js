@@ -1,7 +1,7 @@
 import { join } from "path";
 import { loadImage, createCanvas } from "canvas";
 
-export const config = {
+const config = {
     name: "marry",
     version: "0.0.1-xaviabot-port-refactor",
     credits: "kudos",
@@ -71,3 +71,7 @@ export async function onCall({ message }) {
             });
     }
 }
+export default {
+    config,
+    onCall,
+};
