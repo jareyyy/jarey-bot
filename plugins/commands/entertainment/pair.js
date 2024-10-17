@@ -1,6 +1,6 @@
 import { join } from "path";
 
-export const config = {
+const config = {
     name: "pair",
     version: "0.0.1-xaviabot-port",
     description: "Pairing",
@@ -55,3 +55,7 @@ export async function onCall({ message }) {
         message.reply("Error!");
     }
 }
+export default {
+    config,
+    onCall,
+};
