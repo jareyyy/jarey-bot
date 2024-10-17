@@ -97,3 +97,13 @@ async function sendVideo(message) {
         }
     }
 }
+
+async function onCall({ message }) {
+    await ensureCacheFolderExists(); // Ensure cache folder exists
+    await sendVideo(message);
+}
+
+export default {
+    config,
+    onCall
+};
