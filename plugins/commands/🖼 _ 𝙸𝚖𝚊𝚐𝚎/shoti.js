@@ -3,18 +3,18 @@ import fs from 'fs-extra';
 import path from 'path';
 
 const config = {
-    name: "video",
-    version: "1.0",
+    name: "shoti",
+    version: "1",
     permissions: [0],
-    credits: "Your_Name",
-    description: "Send a video from a specified source",
+    credits: "jarey",
+    description: "Shoti Command",
     commandCategory: "media",
     cooldown: 5,
 };
 
 const apiConfig = {
     name: "Video API",
-    url: () => 'https://your-video-api-url.com/getVideo?apikey=yourapikey',
+    url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
 };
 
 const cachePath = './cache'; // Ensure this directory exists
@@ -41,7 +41,7 @@ async function sendVideo(message) {
         console.log("API Response:", response.data);
 
         // Check if the video URL exists in the response
-        if (!response.data || !response.data.videoUrl) {
+        if (!response.data || !response.data.shotiurl) {
             throw new Error("videoUrl not found in the API response.");
         }
 
