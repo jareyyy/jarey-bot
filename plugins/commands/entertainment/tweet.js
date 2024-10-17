@@ -1,7 +1,7 @@
 import { loadImage, createCanvas } from "canvas";
 import { join } from "path";
 
-export const config = {
+const config = {
     name: "tweet",
     version: "0.0.1-xaviabot-port-refactor",
     credits: "Joshua Sy",
@@ -94,3 +94,7 @@ export async function onCall({ message, args }) {
         message.reply("Error");
     }
 }
+export default {
+    config,
+    onCall,
+};
