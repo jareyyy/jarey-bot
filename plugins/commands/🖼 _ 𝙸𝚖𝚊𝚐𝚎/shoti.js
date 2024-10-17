@@ -1,5 +1,4 @@
 import axios from 'axios';
-import request from 'request';
 import fs from 'fs';
 import path from 'path';
 
@@ -45,7 +44,17 @@ async function sendVideo(message) {
         console.log("Downloading video from:", videoUrl);
         console.log("Saving video to:", videoPath);
 
-        const callback = () => {
+        // Use Axios to download the video
+        const writer = fs.createWriteStream(videoPath);
+        const responseVideo = await axios({
+            url: videoUrl,
+            method: 'GET',
+            responseType: 'stream',
+        });
+
+        responseVideo.data.pipe(writer);
+
+        writer.on('finish', () => {
             message.send({
                 body: `Here is your video from TikTok!`,
                 attachment: fs.createReadStream(videoPath)
@@ -57,16 +66,13 @@ async function sendVideo(message) {
                 }
                 fs.unlinkSync(videoPath); // Clean up the file after sending
             });
-        };
+        });
 
-        // Start downloading the video
-        request(videoUrl)
-            .pipe(fs.createWriteStream(videoPath))
-            .on("close", callback)
-            .on("error", (err) => {
-                console.error("Error downloading video:", err);
-                message.send("Failed to download the video.");
-            });
+        writer.on('error', (err) => {
+            console.error("Error writing video to file:", err);
+            message.send("Failed to save the video.");
+        });
+
     } catch (error) {
         console.error(`Error fetching video from ${name}:`, error.message || error);
         message.send("API error status: 200");
