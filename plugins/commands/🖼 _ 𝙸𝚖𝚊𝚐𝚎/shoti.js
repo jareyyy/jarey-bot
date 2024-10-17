@@ -33,6 +33,12 @@ async function sendVideo({ api, event, args }) {
     const { name } = apiConfig;
     const apiUrl = apiConfig.url();
 
+    // Ensure api is defined
+    if (!api) {
+        console.error("API object is undefined.");
+        return;
+    }
+
     api.setMessageReaction("⏳", event.messageID, (err) => {}, true);
     api.sendTypingIndicator(event.threadID, true);
 
@@ -101,8 +107,3 @@ async function onCall({ api, event, args }) {
     await ensureCacheFolderExists(); // Ensure cache folder exists
     await sendVideo({ api, event, args });
 }
-
-export default {
-    config,
-    onCall
-};
