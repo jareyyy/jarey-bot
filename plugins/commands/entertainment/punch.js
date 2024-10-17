@@ -1,4 +1,4 @@
-export const config = {
+const config = {
     name: "punch",
     version: "0.0.1-xaviabot-port-refactor",
     credits: "Mr.Aik3ro",
@@ -32,3 +32,7 @@ export async function onCall({ message }) {
             reply("Error");
         })
 }
+export default {
+    config,
+    onCall,
+};
