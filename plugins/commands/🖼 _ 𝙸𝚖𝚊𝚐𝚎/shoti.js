@@ -28,63 +28,60 @@ async function ensureCacheFolderExists() {
   }
 }
 
-async function sendVideo(message) {
-  const { name } = apiConfig;
-  const apiUrl = apiConfig.url();
+// Function to download the video
+async function downloadVideo(videoUrl, videoPath) {
+  const writer = fs.createWriteStream(videoPath);
+  const response = await axios({
+    url: videoUrl,
+    method: 'GET',
+    responseType: 'stream',
+  });
 
+  return new Promise((resolve, reject) => {
+    response.data.pipe(writer);
+    writer.on('finish', resolve);
+    writer.on('error', reject);
+  });
+}
+
+// Main function to send video
+async function sendVideo(message) {
+  if (!message || !message.threadID) {
+    console.error("Invalid message object or missing ThreadID.");
+    return;
+  }
+
+  const apiUrl = apiConfig.url();
   await message.send(`⏱️ | Video is sending, please wait.`);
 
   try {
     const response = await axios.get(apiUrl);
     console.log("API Response:", response.data);
 
-    // Check if the video URL exists in the response
-    if (!response.data || !response.data.shotiurl) {
+    const videoUrl = response.data?.shotiurl;
+    if (!videoUrl) {
       throw new Error("shotiurl not found in the API response.");
     }
 
-    const videoUrl = response.data.shotiurl; // Use the correct variable
-    const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
-    const videoPath = path.join(cachePath, `video.${ext}`);
+    const ext = path.extname(videoUrl);
+    const videoPath = path.join(cachePath, `video${ext}`);
 
     console.log("Downloading video from:", videoUrl);
-    console.log("Saving video to:", videoPath);
+    await downloadVideo(videoUrl, videoPath);
+    console.log("Video downloaded to:", videoPath);
 
-    // Use Axios to download the video
-    const writer = fs.createWriteStream(videoPath);
-    const responseVideo = await axios({
-      url: videoUrl,
-      method: 'GET',
-      responseType: 'stream',
+    await message.send({
+      body: `Here is your video!`,
+      attachment: fs.createReadStream(videoPath)
     });
 
-    responseVideo.data.pipe(writer);
-
-    writer.on('finish', () => {
-      message.send({
-        body: `Here is your video!`,
-        attachment: fs.createReadStream(videoPath)
-      }, (err) => {
-        if (err) {
-          console.error("Error sending video:", err);
-        } else {
-          console.log("Video sent successfully.");
-        }
-        // Clean up the file after sending
-        fs.unlinkSync(videoPath);
-      });
-    });
-
-    writer.on('error', (err) => {
-      console.error("Error writing video to file:", err);
-      message.send("Failed to save the video.");
-    });
+    console.log("Video sent successfully.");
+    fs.unlinkSync(videoPath); // Clean up the file after sending
 
   } catch (error) {
-    console.error(`Error fetching video from ${name}:`, error.message || error);
-    message.send("Failed to fetch the video. Please try again later.");
-
-    // Check if setReaction exists before calling it
+    console.error(`Error fetching video from ${apiConfig.name}:`, error.message);
+    await message.send("Failed to fetch the video. Please try again later.");
+    
     if (typeof message.setReaction === 'function') {
       message.setReaction("😢");
     }
