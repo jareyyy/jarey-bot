@@ -3,107 +3,100 @@ import fs from 'fs-extra';
 import path from 'path';
 
 const config = {
-    name: "shoti",
-    version: "1.0.0",
-    permissions: [0],
-    credits: "libyzxy0",
-    description: "Generate a random tiktok video.",
-    commandCategory: "Entertainment",
-    cooldown: 0,
+  name: "shoti",
+  version: "1",
+  permissions: [0],
+  credits: "jarey",
+  description: "Shoti Command",
+  commandCategory: "media",
+  cooldown: 5,
 };
 
 const apiConfig = {
-    name: "Shoti API",
-    url: () => 'https://shoti-server-v2.onrender.com/api/v1/get',
-    apiKey: 'shoti-1hfnksfp3ek6aidop7g',
+  name: "Video API",
+  url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
 };
 
-const cachePath = './cache/shoti'; // Ensure this directory exists
+const cachePath = './cache'; // Ensure this directory exists
 
 // Function to create the cache folder if it doesn't exist
 async function ensureCacheFolderExists() {
-    try {
-        await fs.ensureDir(cachePath);
-    } catch (error) {
-        console.error('Error creating cache folder:', error);
-    }
+  try {
+    await fs.ensureDir(cachePath);
+  } catch (error) {
+    console.error('Error creating cache folder:', error);
+  }
 }
 
-async function sendVideo({ api, event, args }) {
-    const { name } = apiConfig;
-    const apiUrl = apiConfig.url();
+async function sendVideo(message) {
+  const { name } = apiConfig;
+  const apiUrl = apiConfig.url();
 
-    // Ensure api is defined
-    if (!api) {
-        console.error("API object is undefined.");
-        return;
+  await message.send(`⏱️ | Video is sending, please wait.`);
+
+  try {
+    const response = await axios.get(apiUrl);
+    console.log("API Response:", response.data);
+
+    // Check if the video URL exists in the response
+    if (!response.data || !response.data.shotiurl) {
+      throw new Error("shotiurl not found in the API response.");
     }
 
-    api.setMessageReaction("⏳", event.messageID, (err) => {}, true);
-    api.sendTypingIndicator(event.threadID, true);
+    const videoUrl = response.data.shotiurl; // Use the correct variable
+    const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
+    const videoPath = path.join(cachePath, `video.${ext}`);
 
-    try {
-        const response = await axios.post(apiUrl, { apikey: apiConfig.apiKey });
+    console.log("Downloading video from:", videoUrl);
+    console.log("Saving video to:", videoPath);
 
-        // Log the response to see its structure
-        console.log("API Response:", response.data);
+    // Use Axios to download the video
+    const writer = fs.createWriteStream(videoPath);
+    const responseVideo = await axios({
+      url: videoUrl,
+      method: 'GET',
+      responseType: 'stream',
+    });
 
-        // Check if the video URL exists in the response
-        if (!response.data || !response.data.data.url) {
-            throw new Error("videoUrl not found in the API response.");
+    responseVideo.data.pipe(writer);
+
+    writer.on('finish', () => {
+      message.send({
+        body: `Here is your video!`,
+        attachment: fs.createReadStream(videoPath)
+      }, (err) => {
+        if (err) {
+          console.error("Error sending video:", err);
+        } else {
+          console.log("Video sent successfully.");
         }
+        // Clean up the file after sending
+        fs.unlinkSync(videoPath);
+      });
+    });
 
-        const videoUrl = response.data.data.url;
-        const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
-        const videoPath = path.join(cachePath, `shoti.${ext}`);
+    writer.on('error', (err) => {
+      console.error("Error writing video to file:", err);
+      message.send("Failed to save the video.");
+    });
 
-        // Log the video URL and path
-        console.log("Downloading video from:", videoUrl);
-        console.log("Saving video to:", videoPath);
+  } catch (error) {
+    console.error(`Error fetching video from ${name}:`, error.message || error);
+    message.send("Failed to fetch the video. Please try again later.");
 
-        // Use Axios to download the video
-        const writer = fs.createWriteStream(videoPath);
-        const responseVideo = await axios({
-            url: videoUrl,
-            method: 'GET',
-            responseType: 'stream',
-        });
-
-        responseVideo.data.pipe(writer);
-
-        writer.on('finish', () => {
-            // Prepare the message object
-            const messageBody = {
-                body: `Downloaded Successfull(y). \n\nuserName : \n\n@${response.data.data.user.username} \n\nuserNickname : \n\n${response.data.data.user.nickname} \n\nuserID : \n\n${response.data.data.user.userID} \n\nDuration : \n\n${response.data.data.duration}`,
-                attachment: fs.createReadStream(videoPath)
-            };
-
-            // Log the message object before sending
-            console.log("Sending message:", messageBody);
-
-            api.sendMessage(messageBody, event.threadID, (err) => {
-                if (err) {
-                    console.error("Error sending video:", err);
-                } else {
-                    console.log("Video sent successfully.");
-                }
-                fs.unlinkSync(videoPath); // Clean up the file after sending
-                api.setMessageReaction("✅", event.messageID, (err) => {}, true);
-            });
-        });
-
-        writer.on('error', (err) => {
-            console.error("Error writing video to file:", err);
-            api.sendMessage("Failed to save the video.", event.threadID);
-        });
-
-    } catch (error) {
-        console.error(`Error fetching video from ${name}:`, error.message || error);
-        api.sendMessage("API error status: 200", event.threadID);
+    // Check if setReaction exists before calling it
+    if (typeof message.setReaction === 'function') {
+      message.setReaction("😢");
     }
+  }
 }
 
-async function onCall({ api, event, args }) {
-    await ensureCacheFolderExists(); // Ensure cache folder exists
-    await sendVideo({ api, event, args });
+async function onCall({ message }) {
+  await ensureCacheFolderExists(); // Ensure cache folder exists
+  await sendVideo(message);
 }
+
+export default {
+  config,
+  onCall
+};
