@@ -14,7 +14,7 @@ const config = {
 
 const apiConfig = {
     name: "Shoti API",
-    url: () => 'https://jeka-api.luabot24.repl.co/shoti/?apikey=geloo',
+    url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
 };
 
 async function sendVideo(message) {
