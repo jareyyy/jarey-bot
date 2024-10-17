@@ -1,7 +1,7 @@
 import { loadImage, createCanvas } from "canvas";
 import { join } from "path";
 
-export const config = {
+const config = {
     name: "mark",
     version: "0.0.1-xaviabot-port",
     credits: "MewMew mod By hungdz30cm",
@@ -78,3 +78,7 @@ export async function onCall({ message, args }) {
         message.reply("Error");
     }
 }
+export default {
+    config,
+    onCall,
+};
