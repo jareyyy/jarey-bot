@@ -1,6 +1,7 @@
 import axios from 'axios';
 import request from 'request';
 import fs from 'fs';
+import path from 'path';
 
 const config = {
     name: "shoti",
@@ -17,11 +18,13 @@ const apiConfig = {
     url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
 };
 
+const cachePath = './cache'; // Ensure this directory exists
+
 async function sendVideo(message) {
     const { name } = apiConfig;
     const apiUrl = apiConfig.url();
 
-    message.send(`⏱️ | Video is sending please wait.`);
+    message.send(`⏱️ | Video is sending, please wait.`);
 
     try {
         const response = await axios.get(apiUrl);
@@ -36,7 +39,7 @@ async function sendVideo(message) {
 
         const videoUrl = response.data.shotiurl;
         const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
-        const videoPath = `${__dirname}/cache/shoti.${ext}`;
+        const videoPath = path.join(cachePath, `shoti.${ext}`);
 
         // Log the video URL and path
         console.log("Downloading video from:", videoUrl);
@@ -44,7 +47,7 @@ async function sendVideo(message) {
 
         const callback = () => {
             message.send({
-                body: `random bebegurl sa tiktok`,
+                body: `Here is your video from TikTok!`,
                 attachment: fs.createReadStream(videoPath)
             }, (err) => {
                 if (err) {
