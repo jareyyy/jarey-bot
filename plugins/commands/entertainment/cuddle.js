@@ -1,4 +1,4 @@
-export const config = {
+const config = {
     name: "cuddle",
     version: "0.0.1-xaviabot-port-refactor",
     description: "cuddle someone you tag",
@@ -27,3 +27,7 @@ export function onCall({ message }) {
         })
         .catch(console.error);
 }
+export default {
+    config,
+    onCall,
+};
