@@ -4,20 +4,21 @@ import path from 'path';
 
 const config = {
     name: "shoti",
-    version: "1",
+    version: "1.0.0",
     permissions: [0],
-    credits: "jarey",
-    description: "Shoti Command",
-    commandCategory: "media",
-    cooldown: 5,
+    credits: "libyzxy0",
+    description: "Generate a random tiktok video.",
+    commandCategory: "Entertainment",
+    cooldown: 0,
 };
 
 const apiConfig = {
-    name: "Video API",
-    url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
+    name: "Shoti API",
+    url: () => 'https://shoti-server-v2.onrender.com/api/v1/get',
+    apiKey: 'shoti-1hfnksfp3ek6aidop7g',
 };
 
-const cachePath = './cache'; // Ensure this directory exists
+const cachePath = './cache/shoti'; // Ensure this directory exists
 
 // Function to create the cache folder if it doesn't exist
 async function ensureCacheFolderExists() {
@@ -28,26 +29,27 @@ async function ensureCacheFolderExists() {
     }
 }
 
-async function sendVideo(message) {
+async function sendVideo({ api, event, args }) {
     const { name } = apiConfig;
     const apiUrl = apiConfig.url();
 
-    await message.send(`⏱️ | Video is sending, please wait.`);
+    api.setMessageReaction("⏳", event.messageID, (err) => {}, true);
+    api.sendTypingIndicator(event.threadID, true);
 
     try {
-        const response = await axios.get(apiUrl);
-        
+        const response = await axios.post(apiUrl, { apikey: apiConfig.apiKey });
+
         // Log the response to see its structure
         console.log("API Response:", response.data);
 
         // Check if the video URL exists in the response
-        if (!response.data || !response.data.shotiurl) {
+        if (!response.data || !response.data.data.url) {
             throw new Error("videoUrl not found in the API response.");
         }
 
-        const videoUrl = response.data.shotiurl;
+        const videoUrl = response.data.data.url;
         const ext = videoUrl.substring(videoUrl.lastIndexOf(".") + 1);
-        const videoPath = path.join(cachePath, `video.${ext}`);
+        const videoPath = path.join(cachePath, `shoti.${ext}`);
 
         // Log the video URL and path
         console.log("Downloading video from:", videoUrl);
@@ -64,49 +66,40 @@ async function sendVideo(message) {
         responseVideo.data.pipe(writer);
 
         writer.on('finish', () => {
-            // Check if message.send is a function
-            if (typeof message.send === 'function') {
-                // Prepare the message object
-                const messageBody = {
-                    body: `Here is your video!`,
-                    attachment: fs.createReadStream(videoPath)
-                };
+            // Prepare the message object
+            const messageBody = {
+                body: `Downloaded Successfull(y). \n\nuserName : \n\n@${response.data.data.user.username} \n\nuserNickname : \n\n${response.data.data.user.nickname} \n\nuserID : \n\n${response.data.data.user.userID} \n\nDuration : \n\n${response.data.data.duration}`,
+                attachment: fs.createReadStream(videoPath)
+            };
 
-                // Log the message object before sending
-                console.log("Sending message:", messageBody);
+            // Log the message object before sending
+            console.log("Sending message:", messageBody);
 
-                message.send(messageBody, (err) => {
-                    if (err) {
-                        console.error("Error sending video:", err);
-                    } else {
-                        console.log("Video sent successfully.");
-                    }
-                    fs.unlinkSync(videoPath); // Clean up the file after sending
-                });
-            } else {
-                console.error("message.send is not a function.");
-            }
+            api.sendMessage(messageBody, event.threadID, (err) => {
+                if (err) {
+                    console.error("Error sending video:", err);
+                } else {
+                    console.log("Video sent successfully.");
+                }
+                fs.unlinkSync(videoPath); // Clean up the file after sending
+                api.setMessageReaction("✅", event.messageID, (err) => {}, true);
+            });
         });
 
         writer.on('error', (err) => {
             console.error("Error writing video to file:", err);
-            message.send("Failed to save the video.");
+            api.sendMessage("Failed to save the video.", event.threadID);
         });
 
     } catch (error) {
         console.error(`Error fetching video from ${name}:`, error.message || error);
-        message.send("API error status: 200");
-        
-        // Check if setReaction exists before calling it
-        if (typeof message.setReaction === 'function') {
-            message.setReaction("😢");
-        }
+        api.sendMessage("API error status: 200", event.threadID);
     }
 }
 
-async function onCall({ message }) {
+async function onCall({ api, event, args }) {
     await ensureCacheFolderExists(); // Ensure cache folder exists
-    await sendVideo(message);
+    await sendVideo({ api, event, args });
 }
 
 export default {
