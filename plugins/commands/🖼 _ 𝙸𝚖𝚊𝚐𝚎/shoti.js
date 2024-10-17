@@ -66,10 +66,16 @@ async function sendVideo(message) {
         writer.on('finish', () => {
             // Check if message.send is a function
             if (typeof message.send === 'function') {
-                message.send({
+                // Prepare the message object
+                const messageBody = {
                     body: `Here is your video!`,
                     attachment: fs.createReadStream(videoPath)
-                }, (err) => {
+                };
+
+                // Log the message object before sending
+                console.log("Sending message:", messageBody);
+
+                message.send(messageBody, (err) => {
                     if (err) {
                         console.error("Error sending video:", err);
                     } else {
