@@ -49,8 +49,11 @@ Chat -𝚑𝚎𝚕𝚙 <command name>
 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎 𝚌𝚘𝚖𝚖𝚊𝚗𝚍𝚜.
 
 𝙴𝚡𝚊𝚖𝚙𝚕𝚎: -help gemini
+
+Dev: John Rey Bagunas
 ━━━━━━━━━━━━━━━━
 `);
+        return api.shareContact(helpMessage, api.getCurrentUserID(), event.threadID);
     }
 
     const command = commandsConfig.get(getCommandName(commandName));
