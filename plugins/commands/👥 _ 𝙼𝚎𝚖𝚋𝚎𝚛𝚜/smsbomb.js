@@ -1,9 +1,6 @@
 import axios from 'axios';
-import pkg from 'fs-extra';
-import request from 'request';
 
-const { writeFileSync, createReadStream } = pkg;
-
+// Configuration
 const config = {
     name: 'smsbomb',
     version: '1.0.0',
@@ -14,6 +11,7 @@ const config = {
     credits: 'Deku (rest api)',
 };
 
+// Function to handle SMS bombing
 async function execute(senderId, args, pageAccessToken, sendMessage) {
     const [number, amount, delay] = args;
 
@@ -23,7 +21,7 @@ async function execute(senderId, args, pageAccessToken, sendMessage) {
     }
 
     try {
-        const apiUrl = `https://deku-rest-api-3ijr.onrender.com/smsb?number=${number}&amount=${amount}&delay=${delay}`;
+        const apiUrl = `https://deku-rest-apis.ooguy.com/smsb?number=${number}&amount=${amount}&delay=${delay}`;
         const response = await axios.get(apiUrl);
         
         const { status, success, fail } = response.data;
@@ -38,37 +36,27 @@ async function execute(senderId, args, pageAccessToken, sendMessage) {
     }
 }
 
-// The onCall function to handle incoming commands
+// Function to handle incoming commands
 async function onCall({ event, api }) {
-    // Log the incoming event for debugging
-    console.log('Received event:', event);
-
-    // Validate the event object
     if (!event || !event.threadID || !event.senderID || !event.body) {
         console.error('Invalid event object:', event);
-        return; // Exit if the event object is invalid
+        return;
     }
 
-    const { threadID, senderID, body } = event;
-    const args = body.split(' ').slice(1); // Extract arguments from the command
+    const { senderID, body } = event;
+    const args = body.split(' ').slice(1);
 
-    // Call the execute function with the relevant parameters
-    await execute(senderID, args, event.pageAccessToken, api.sendMessage);
-}
-
-// Example of how to invoke onCall (this part should be in your message handling logic)
-function handleIncomingMessage(event, api) {
-    // Assuming this function is called when a new message is received
-    onCall({ event, api }).catch(error => {
-        console.error('Error in onCall:', error);
-    });
+    if (body.startsWith('smsbomb')) {
+        await execute(senderID, args, event.pageAccessToken, api.sendMessage);
+    }
 }
 
 // Simulating the message listener (replace this with your actual message listener)
 function messageListener(api) {
     api.listen((event) => {
-        // Call the message handler when a new message is received
-        handleIncomingMessage(event, api);
+        onCall({ event, api }).catch(error => {
+            console.error('Error in onCall:', error);
+        });
     });
 }
 
@@ -77,6 +65,5 @@ export default {
     config,
     execute,
     onCall,
-    handleIncomingMessage,
     messageListener,
 };
