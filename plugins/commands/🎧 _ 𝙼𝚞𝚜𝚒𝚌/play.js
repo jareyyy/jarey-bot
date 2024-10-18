@@ -5,6 +5,7 @@ import { dirname } from 'path';
 
 const config = {
     name: "play",
+    aliases: ["play"],
     version: "1.0.0",
     info: "Get music",
     cooldown: 10,
