@@ -5,7 +5,7 @@ import { dirname } from 'path';
 
 const config = {
     name: "spotify",
-    aliases: ["play"],
+    aliases: ["spot"],
     version: "1.7",
     credits: "Vex_Kshitiz/coffee",
     description: "Play a song from Spotify",
