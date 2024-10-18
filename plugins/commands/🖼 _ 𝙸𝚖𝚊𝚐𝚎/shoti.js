@@ -12,11 +12,9 @@ const config = {
   cooldown: 5,
 };
 
-const apikey = 'shoti-0c84a66d4efac6d30bd14600d604e134fa513aef0098f4b4403cd73e10cea235984c607ee279236eef4f7d3807eaa7a57259592f140bb92897a9e39432ba18d557ead768f67babc6d9c9152c9cd6b69ed12599b723';
-
 const apiConfig = {
   name: "Video API",
-  url: () => 'https://shoti.kenliejugarap.com/getvideo.php?apikey=${apikey}',
+  url: () => 'https://betadash-shoti-yazky.vercel.app/shotizxx?apikey=shipazu',
 };
 
 const cachePath = './cache'; // Ensure this directory exists
