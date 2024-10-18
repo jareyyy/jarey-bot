@@ -10,7 +10,22 @@ const jobs = [
     {
         time: "21 22 * * *", // every day at 22:21 (10:21 PM)
         message: () => "It's 10:21 PM, good night!",
-        targetIDs: ["100008907121641"], // list of ids that bot will send to, remove this to send to all group
+    },
+    {
+        time: "0 9 * * *", // every day at 09:00 (9 AM)
+        message: () => "Good morning! It's 9 AM! \n Gising na boss!",
+    },
+    {
+        time: "0 12 * * *", // every day at 12:00 (noon)
+        message: () => "It's noon! Time for lunch!",
+    },
+    {
+        time: "0 18 * * *", // every day at 18:00 (6 PM)
+        message: () => "It's 6 PM, time to wrap up the day!",
+    },
+    {
+        time: "0 0 * * *", // every day at 00:00 (midnight)
+        message: () => "It's midnight! A new day has begun!",
     },
 ];
 
