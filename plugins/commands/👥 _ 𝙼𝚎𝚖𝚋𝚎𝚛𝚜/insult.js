@@ -1,40 +1,39 @@
+import axios from 'axios';
+
 const config = {
-    name: "insultGenerator",
-    aliases: ["insult"], // Name and alias are the same
+    name: "insult",
+    aliases: ["insult"],
     description: "Fetches a random insult.",
     usage: "[command]",
     cooldown: 5,
     permissions: [0], // Assuming 0 means no special permissions are required
     credits: "jarey"
-}
+};
 
-async function fetchInsult() {
-    const response = await fetch("https://deku-rest-apis.ooguy.com/insult");
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    return data.insult; // Assuming the API returns an object with an 'insult' property
-}
+async function onCall({ message, args }) {
+    // No additional arguments are needed for this command
+    await message.react("😈"); // Indicate processing
 
-async function onCall({ message }) {
-    const { senderID, mentions, reply, type } = message;
-    
-    // Determine the target for the insult
-    const targetID = Object.keys(mentions).length === 0 
-        ? (type === "message_reply" ? message.messageReply.senderID : senderID) 
-        : Object.entries(mentions).map(e => `${e[1].replace(/@/g, '')} - ${e[0]}`).join("\n");
+    const apiUrl = "https://deku-rest-apis.ooguy.com/insult"; // API endpoint
 
     try {
-        const insult = await fetchInsult(); // Fetch the insult from the API
-        reply(`Insult for ${targetID}:\n${insult}`); // Reply with the insult
+        const response = await axios.get(apiUrl); // Fetching the insult
+
+        if (!response.data || !response.data.insult) {
+            throw new Error("No insult found in the response");
+        }
+
+        const insult = response.data.insult; // Extracting the insult from the response
+        await message.reply(`Here is an insult:\n${insult}`); // Reply with the insult
+        await message.react("✅"); // React with ✅ on success
     } catch (error) {
-        reply("Sorry, I couldn't fetch an insult at this moment.");
-        console.error(error); // Log the error for debugging
+        console.error('Error:', error.response ? error.response.data : error.message);
+        await message.react("❎"); // React with ❎ on error
+        await message.reply("Sorry, I couldn't fetch an insult at this moment."); // Error message
     }
 }
 
 export default {
     config,
-    onCall
-}
+    onCall,
+};
