@@ -6,17 +6,20 @@ import yts from 'yt-search';
 
 const config = {
     name: "play",
-    aliases: ["play"],
+    aliases: ["playyt"],
     version: "1.0.0",
-    info: "Get music",
-    cooldown: 10,
-    dev: "Jonell Magallanes"
+    credits: "Your_Name",
+    description: "Play a song from YouTube",
+    usages: "<song-name>",
+    category: "Music",
+    cooldown: 10
 };
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const cacheFolder = `${__dirname}/cache`;
 
-// Ensure cache folder exists
+// Function to create the cache folder if it doesn't exist
 async function ensureCacheFolderExists() {
     try {
         await fs.ensureDir(cacheFolder);
@@ -26,44 +29,41 @@ async function ensureCacheFolderExists() {
 }
 
 // Main function to handle music search and download
-async function onCall({ api, event, target }) {
-    if (!event) {
-        console.error("Event is undefined");
-        return;
-    }
+async function onCall({ message, args }) {
+    const { messageID, threadID } = message;
+    const songTitle = args.join(" ");
 
-    const { threadID } = event;
-    if (!target[0]) {
-        return api.sendMessage(`❌ Please enter a music name!`, threadID);
+    if (!songTitle) {
+        return message.send(`❌ Please enter a music name!`);
     }
-
-    const song = target.join(" ");
-    const findingMessage = await api.sendMessage(`🔍 | Finding "${song}". Please wait...`, threadID);
 
     try {
         await ensureCacheFolderExists();
-        const firstResult = (await yts(song)).videos[0];
+        await message.react("⌛");
+
+        const searchResults = await yts(songTitle);
+        const firstResult = searchResults.videos[0];
 
         if (!firstResult) {
-            return api.editMessage(`❌ | No results found for "${song}".`, findingMessage.messageID, threadID);
+            return message.send(`❌ | No results found for "${songTitle}".`);
         }
 
         const { title, url } = firstResult;
-        await api.editMessage(`⏱️ | Music Title has been Found: "${title}". Downloading...`, findingMessage.messageID);
+        await message.send(`⏱️ | Music Title has been Found: "${title}". Downloading...`);
 
         const downloadLink = (await axios.get(`https://ccprojectsjonellproject.vercel.app/api/dl?url=${url}`)).data.data.downloadLink.url;
         const filePath = await downloadTrack(downloadLink);
 
-        await api.sendMessage({
-            body: `🎵 Music Player\nHere is your music about your search "${song}"\n\nTitle: ${title}\nYoutube Link: ${url}`,
+        await message.reply({
+            body: `🎵 Playing: "${title}"\nYouTube Link: ${url}`,
             attachment: fs.createReadStream(filePath)
-        }, threadID);
+        });
 
         fs.unlinkSync(filePath);
-        api.unsendMessage(findingMessage.messageID);
+        await message.react("✅"); // React with ✅ on success
     } catch (error) {
-        console.error(error);
-        await api.editMessage(`❌ | ${error.message}`, findingMessage.messageID, threadID);
+        console.error("Error occurred:", error);
+        await message.send(`❌ | An error occurred: ${error.message}`);
     }
 }
 
