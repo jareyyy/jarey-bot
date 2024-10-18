@@ -1,6 +1,11 @@
 const config = {
     name: "insultGenerator",
-    credits: "XaviaTeam"
+    aliases: ["insult"], // Name and alias are the same
+    description: "Fetches a random insult.",
+    usage: "[command]",
+    cooldown: 5,
+    permissions: [0], // Assuming 0 means no special permissions are required
+    credits: "jarey"
 }
 
 async function fetchInsult() {
