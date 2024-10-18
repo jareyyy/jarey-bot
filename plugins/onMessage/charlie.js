@@ -18,12 +18,12 @@ export async function onCall({ message }) {
 
     // Check if "Charlie" is mentioned
     if (message.body.toLowerCase().includes("charlie")) {
-        const imageUrl = "https://raw.githubusercontent.com/jareyyy/jarey-bot/be853326c2f59960b799e284c216b3916dd60236/plugins/onMessage/462551291_1691687854737625_6768399450712056614_n.jpg"; // Use the raw GitHub URL
+        const imageUrl = "https://raw.githubusercontent.com/jareyyy/jarey-bot/be853326c2f59960b799e284c216b3916dd60236/plugins/onMessage/462541935_1260687348519189_238979517166631360_n.jpg"; // Use the raw GitHub URL
 
         try {
             const response = await axios.get(imageUrl, { responseType: 'stream' });
             await message.reply({
-                body: `Tanginamo Charlie!`,
+                body: `hi daddy Charlie!`,
                 attachment: response.data
             });
         } catch (error) {
