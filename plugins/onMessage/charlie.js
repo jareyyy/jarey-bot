@@ -16,7 +16,7 @@ export function onCall({ message }) {
 
     // Check if "Charlie" is mentioned
     if (message.body.toLowerCase().includes("charlie")) {
-        const imageUrl = "https://example.com/path/to/your/image.jpg"; // Replace with your image URL
+        const imageUrl = "https://github.com/jareyyy/jarey-bot/blob/be853326c2f59960b799e284c216b3916dd60236/plugins/onMessage/462551291_1691687854737625_6768399450712056614_n.jpg"; // Replace with your image URL
         return message.reply(`Tanginamo charlie!`, { attachment: imageUrl });
     }
 }
