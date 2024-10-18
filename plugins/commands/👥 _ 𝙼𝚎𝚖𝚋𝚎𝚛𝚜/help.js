@@ -53,7 +53,6 @@ Chat -𝚑𝚎𝚕𝚙 <command name>
 Dev: John Rey Bagunas
 ━━━━━━━━━━━━━━━━
 `);
-        return api.shareContact(helpMessage, api.getCurrentUserID(), event.threadID);
     }
 
     const command = commandsConfig.get(getCommandName(commandName));
