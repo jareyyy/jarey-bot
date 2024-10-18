@@ -2,6 +2,7 @@ import axios from 'axios';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import yts from 'yt-search'; // Make sure to import yts if you are using it
 
 const config = {
     name: "play",
@@ -26,6 +27,12 @@ async function ensureCacheFolderExists() {
 }
 
 async function onCall({ api, event, target }) {
+    // Check if event is defined and destructure safely
+    if (!event) {
+        console.error("Event is undefined");
+        return; // Exit early if event is not defined
+    }
+
     const { threadID } = event;
 
     if (!target[0]) {
