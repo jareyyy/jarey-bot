@@ -1,40 +1,39 @@
+import axios from 'axios';
+
 const config = {
-    name: "bibleverse",
-    aliases: ["bible"], // Name and alias are the same
+    name: "bible",
+    aliases: ["bible"],
     description: "Fetches a random Bible verse.",
     usage: "[command]",
     cooldown: 5,
     permissions: [0], // Assuming 0 means no special permissions are required
     credits: "jarey"
-}
+};
 
-async function fetchBibleVerse() {
-    const response = await fetch("https://deku-rest-apis.ooguy.com/bible");
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    return data.verse; // Assuming the API returns an object with a 'verse' property
-}
+async function onCall({ message, args }) {
+    // No additional arguments are needed for this command
+    await message.react("📖"); // Indicate processing
 
-async function onCall({ message }) {
-    const { senderID, mentions, reply, type } = message;
-    
-    // Determine the target for the Bible verse
-    const targetID = Object.keys(mentions).length === 0 
-        ? (type === "message_reply" ? message.messageReply.senderID : senderID) 
-        : Object.entries(mentions).map(e => `${e[1].replace(/@/g, '')} - ${e[0]}`).join("\n");
+    const apiUrl = "https://deku-rest-apis.ooguy.com/bible"; // API endpoint
 
     try {
-        const verse = await fetchBibleVerse(); // Fetch the Bible verse from the API
-        reply(`Bible verse for ${targetID}:\n${verse}`); // Reply with the Bible verse
+        const response = await axios.get(apiUrl); // Fetching the Bible verse
+
+        if (!response.data || !response.data.verse) {
+            throw new Error("No verse found in the response");
+        }
+
+        const verse = response.data.verse; // Extracting the verse from the response
+        await message.reply(`Here is a Bible verse:\n${verse}`); // Reply with the Bible verse
+        await message.react("✅"); // React with ✅ on success
     } catch (error) {
-        reply("Sorry, I couldn't fetch a Bible verse at this moment.");
-        console.error(error); // Log the error for debugging
+        console.error('Error:', error.response ? error.response.data : error.message);
+        await message.react("❎"); // React with ❎ on error
+        await message.reply("Sorry, I couldn't fetch a Bible verse at this moment."); // Error message
     }
 }
 
 export default {
     config,
-    onCall
-}
+    onCall,
+};
