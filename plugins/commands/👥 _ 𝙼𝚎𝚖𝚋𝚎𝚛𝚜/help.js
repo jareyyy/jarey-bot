@@ -1,5 +1,5 @@
 const config = {
-    name: "help",
+    name: "help", "tulong",
     aliases: ["cmds", "commands"],
     version: "1.0.3",
     description: "Show all commands or command details",
