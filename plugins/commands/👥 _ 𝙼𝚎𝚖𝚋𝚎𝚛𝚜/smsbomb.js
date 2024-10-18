@@ -40,6 +40,10 @@ async function execute(senderId, args, pageAccessToken, sendMessage) {
 
 // The onCall function to handle incoming commands
 async function onCall({ event, api }) {
+    // Log the incoming event for debugging
+    console.log('Received event:', event);
+
+    // Validate the event object
     if (!event || !event.threadID || !event.senderID || !event.body) {
         console.error('Invalid event object:', event);
         return; // Exit if the event object is invalid
@@ -52,9 +56,27 @@ async function onCall({ event, api }) {
     await execute(senderID, args, event.pageAccessToken, api.sendMessage);
 }
 
+// Example of how to invoke onCall (this part should be in your message handling logic)
+function handleIncomingMessage(event, api) {
+    // Assuming this function is called when a new message is received
+    onCall({ event, api }).catch(error => {
+        console.error('Error in onCall:', error);
+    });
+}
+
+// Simulating the message listener (replace this with your actual message listener)
+function messageListener(api) {
+    api.listen((event) => {
+        // Call the message handler when a new message is received
+        handleIncomingMessage(event, api);
+    });
+}
+
 // Exporting the config and functions
 export default {
     config,
     execute,
     onCall,
+    handleIncomingMessage,
+    messageListener,
 };
