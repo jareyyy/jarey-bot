@@ -71,6 +71,7 @@ async function onCall({ message, args, getLang }) {
         });
 
         console.log("Audio sent successfully.");
+        await message.react("✅"); // React with ✅ on success
     } catch (error) {
         console.error("Error occurred:", error);
         await message.send(header + `An error occurred: ${error.message}` + footer);
