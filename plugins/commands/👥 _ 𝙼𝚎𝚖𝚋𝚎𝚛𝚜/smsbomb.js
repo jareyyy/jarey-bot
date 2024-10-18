@@ -38,7 +38,18 @@ async function execute(senderId, args, pageAccessToken, sendMessage) {
     }
 }
 
+// The onCall function to handle incoming commands
+async function onCall({ event, api, Threads }) {
+    const { threadID, messageID, body } = event;
+    const args = body.split(' ').slice(1); // Extract arguments from the command
+
+    // Call the execute function with the relevant parameters
+    await execute(event.senderID, args, event.pageAccessToken, api.sendMessage);
+}
+
+// Exporting the config and functions
 export default {
     config,
     execute,
+    onCall,
 };
