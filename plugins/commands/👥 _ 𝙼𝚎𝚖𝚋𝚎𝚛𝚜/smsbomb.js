@@ -1,6 +1,8 @@
 import axios from 'axios';
-import { writeFileSync, createReadStream } from 'fs-extra';
+import pkg from 'fs-extra';
 import request from 'request';
+
+const { writeFileSync, createReadStream } = pkg;
 
 const config = {
     name: 'smsbomb',
