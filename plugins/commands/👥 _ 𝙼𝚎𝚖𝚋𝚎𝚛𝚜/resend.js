@@ -20,13 +20,18 @@ let botID;
 async function handleEvent({ event, api, Users }) {
     const { messageID, senderID, threadID, body: content, type } = event;
 
-    if (!botID) botID = await api.getCurrentUser ID();
+    // Fetch bot ID if not already fetched
+    if (!botID) botID = await api.getCurrentUser ID(); // Fixed method call
 
     // Ignore messages sent by the bot itself
     if (senderID === botID) return;
 
-    // Log the message if it’s not an unsent message
+    // Handle message logging for non-unsent messages
     if (type !== "message_unsend") {
+        // Check if the message has already been logged (to prevent resending)
+        if (logMessage.has(messageID)) {
+            return; // Skip logging if the message was already logged
+        }
         logMessage.set(messageID, { msgBody: content, attachment: event.attachments });
         return; // Exit after logging
     }
