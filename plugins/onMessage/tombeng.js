@@ -18,7 +18,7 @@ export async function onCall({ message }) {
             const response = await axios.get(imageUrl, { responseType: 'stream' });
             if (response && response.data) {
                 await message.reply({
-                    body: `hi daddy Tombeng!`,
+                    body: `Tombeng??`,
                     attachment: response.data
                 });
             } else {
@@ -38,7 +38,7 @@ export async function onCall({ message }) {
             const response = await axios.get(ronmelImageUrl, { responseType: 'stream' });
             if (response && response.data) {
                 await message.reply({
-                    body: `hi daddy Ronmel!`,
+                    body: `ronmel??`,
                     attachment: response.data
                 });
             } else {
