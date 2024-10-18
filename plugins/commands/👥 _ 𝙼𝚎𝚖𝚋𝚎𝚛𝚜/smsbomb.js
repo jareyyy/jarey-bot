@@ -39,12 +39,17 @@ async function execute(senderId, args, pageAccessToken, sendMessage) {
 }
 
 // The onCall function to handle incoming commands
-async function onCall({ event, api, Threads }) {
-    const { threadID, messageID, body } = event;
+async function onCall({ event, api }) {
+    if (!event || !event.threadID || !event.senderID || !event.body) {
+        console.error('Invalid event object:', event);
+        return; // Exit if the event object is invalid
+    }
+
+    const { threadID, senderID, body } = event;
     const args = body.split(' ').slice(1); // Extract arguments from the command
 
     // Call the execute function with the relevant parameters
-    await execute(event.senderID, args, event.pageAccessToken, api.sendMessage);
+    await execute(senderID, args, event.pageAccessToken, api.sendMessage);
 }
 
 // Exporting the config and functions
