@@ -13,6 +13,15 @@ export async function onLoad() {
     // Any necessary preloading can be handled here if needed
 }
 
+// Function to shuffle an array
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 export async function flirt(message, body, time) {
     return new Promise(resolve => {
         setTimeout(() => {
@@ -58,7 +67,10 @@ export async function onCall({ message }) {
         { body: "Good bye, see you in the next program.", time: 90000 },
     ];
 
-    for (const { body, time, mentions } of flirtMessages) {
+    // Shuffle the messages and select the first 3
+    const selectedMessages = shuffleArray(flirtMessages).slice(0, 3);
+
+    for (const { body, time, mentions } of selectedMessages) {
         await flirt(message, { body, mentions }, time);
     }
 }
