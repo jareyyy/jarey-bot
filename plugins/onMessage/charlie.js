@@ -1,9 +1,3 @@
-/**
- * Cautions:
- * - This plugin may cause your bot to be banned by Facebook because of spamming reactions.
- * - Use this plugin at your own risk.
- */
-
 import axios from 'axios'; // Ensure you import the axios module for HTTP requests
 
 export const config = {
@@ -18,7 +12,7 @@ export async function onCall({ message }) {
 
     // Check if "Charlie" is mentioned
     if (message.body.toLowerCase().includes("charlie")) {
-        const imageUrl = "https://raw.githubusercontent.com/jareyyy/jarey-bot/be853326c2f59960b799e284c216b3916dd60236/plugins/onMessage/462541935_1260687348519189_238979517166631360_n.jpg"; // Use the raw GitHub URL
+        const imageUrl = "https://raw.githubusercontent.com/jareyyy/jarey-bot/48144b85a0dc2c70464b409e6212cc026aa9a86f/plugins/onMessage/462541935_1260687348519189_238979517166631360_n.jpg"; // Updated raw GitHub URL
 
         try {
             const response = await axios.get(imageUrl, { responseType: 'stream' });
